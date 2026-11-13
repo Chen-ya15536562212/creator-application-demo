@@ -45,7 +45,7 @@ dialog{padding:0;width:min(500px,calc(100% - 24px));max-height:calc(100% - 24px)
     <section class="panel" aria-label="申诉审批列表">
       <form class="filters" id="filters">
         <label class="field-inline">期数 <select name="period"><option value="">请选择</option><option>第4期</option><option>第3期</option></select></label>
-        <label class="field-inline">状态 <select name="status"><option value="">请选择</option><option>待处理</option><option>通过</option><option>驳回</option><option>已修改</option></select></label>
+        <label class="field-inline">状态 <select name="status"><option value="" selected hidden disabled>请选择</option><option>待处理</option><option>通过</option><option>驳回</option><option>已修改</option></select></label>
         <div class="filter-actions"><button type="button" class="btn" id="reset-filters">重 置</button><button class="btn primary">查 询</button><button type="button" class="link" id="expand" aria-controls="extra" aria-expanded="false">展开 ⌄</button></div>
         <div class="extra" id="extra" hidden><label class="field-inline">UID <input name="uid" inputmode="numeric" placeholder="请输入 UID"></label><label class="field-inline">期望赛道 <select name="target" id="filter-track"></select></label></div>
       </form>
