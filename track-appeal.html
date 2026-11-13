@@ -13,7 +13,7 @@
 dialog{padding:0;width:min(500px,calc(100% - 24px));max-height:calc(100% - 24px);overflow:auto;border:0;border-radius:8px;box-shadow:0 16px 48px #0003;color:var(--ink)}dialog::backdrop{background:#13192352}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line)}.modal-body{padding:17px 20px}.modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid var(--line)}.form-field{display:grid;gap:6px;margin-bottom:14px}.form-field textarea{min-height:96px;resize:vertical}.form-field:last-child{margin-bottom:0}.required,.error{color:#bd3039}.error{min-height:1em;margin:5px 0 0}.hint,.minor{color:var(--muted);font-size:12px}.notice{background:#eef5ff;color:#24528c;border:1px solid #d9e9ff;border-radius:5px;padding:9px 10px;margin:0 0 13px}.notice.warning{color:#805619;background:#fff8e8;border-color:#f8e1ae}.facts{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:8px 17px;margin:0 0 14px}.facts dt{color:var(--muted)}.facts dd{margin:0;overflow-wrap:anywhere;white-space:pre-wrap}.log{margin-top:13px;padding-top:11px;border-top:1px solid var(--line)}.log ul{margin:6px 0 0;padding-left:18px}.log li+li{margin-top:6px}.choice{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:5px;padding:7px 9px;margin:0 0 8px;cursor:pointer}.choice input{min-height:0;margin:0;accent-color:var(--blue)}.choice b{display:block}.choice:has(:checked){background:#f1f7ff;border-color:#9dc8ff}.confirm{position:fixed;inset:auto;margin:0;width:249px;overflow:visible}.confirm::after{content:"";position:absolute;left:var(--pointer,50%);bottom:-5px;width:10px;height:10px;background:white;transform:translateX(-50%) rotate(45deg);z-index:-1}.confirm.below::after{top:-5px;bottom:auto}.confirm::backdrop{background:transparent}.confirm .modal-body{padding:12px}.confirm .modal-foot{border:0;padding:0 12px 10px}.confirm-text{display:flex;align-items:center;gap:7px;font-size:14px}.warn-dot{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:#ffac16;color:#fff;font-weight:bold;font-size:11px;flex:none}.confirm .hint{margin:5px 0 0 23px}.toast{position:fixed;z-index:3;top:14px;left:50%;transform:translateX(-50%);padding:9px 16px;background:#fff;border:1px solid #dcebd7;border-radius:6px;box-shadow:0 6px 20px #0002;color:#226324}.toast.failure{border-color:#ffc3c6;color:#aa2830}
 .creator-main{min-height:100vh;background:#f6f7f9}.creator-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px max(18px,calc((100% - 760px)/2));background:#fff;border-bottom:1px solid var(--line);white-space:nowrap}.creator-bar strong{font-size:15px}.creator-content{width:min(760px,calc(100% - 32px));margin:26px auto}.creator-content h1{margin-bottom:13px}.creator-card{background:#fff;border:1px solid var(--line);border-radius:7px;padding:16px;margin-bottom:13px}.creator-card select{min-width:145px;max-width:100%}.creator-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.track{display:inline-flex;padding:2px 8px;border-radius:4px;background:#edf5ff;color:#1c59b6;font-weight:650}.history-item{padding:12px 0;border-bottom:1px solid var(--line)}.history-item:last-child{border-bottom:0;padding-bottom:0}.history-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.history-item .minor{margin-top:3px}.feedback{margin-top:9px;padding:9px 11px;background:#fff4f4;border-radius:5px;color:#782c31;overflow-wrap:anywhere;white-space:pre-wrap}.feedback strong{display:block;margin-bottom:2px}
 @media(max-width:1000px){.shell{grid-template-columns:162px minmax(0,1fr)}.main{padding:16px}.panel{padding:18px}.filters{gap:11px 15px}}@media(max-width:760px){.shell{display:block}.sidebar{display:none}.main{padding:12px}.panel{padding:12px}.filters{grid-template-columns:1fr 1fr}.filter-actions{grid-column:1/-1}.title-actions{width:100%}}@media(max-width:420px){.filters{grid-template-columns:1fr}.creator-bar{white-space:normal}.title-actions .btn{padding-inline:8px}}
-#review-track option:disabled,#track-target option:disabled{color:var(--muted)}
+#review-track option:disabled{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -40,13 +40,12 @@ dialog{padding:0;width:min(500px,calc(100% - 24px));max-height:calc(100% - 24px)
   <main class="main">
     <div class="crumb"><span>视频同好计划</span><span aria-hidden="true">/</span><strong>申诉审批</strong></div>
     <div class="page-title">
-      <h1>申诉审批</h1>
-      <div class="title-actions"><button class="btn" id="creator-preview">创作者端预览</button><button class="btn phase" id="rollout"></button><button class="btn primary" id="manual">手动改赛道</button></div>
+      <h1 id="approval-title" tabindex="-1">申诉审批</h1>
     </div>
     <section class="panel" aria-label="申诉审批列表">
       <form class="filters" id="filters">
         <label class="field-inline">期数 <select name="period"><option value="">请选择</option><option>第4期</option><option>第3期</option></select></label>
-        <label class="field-inline">状态 <select name="status"><option value="">请选择</option><option>待处理</option><option>通过</option><option>驳回</option></select></label>
+        <label class="field-inline">状态 <select name="status"><option value="">请选择</option><option>待处理</option><option>通过</option><option>驳回</option><option>已修改</option></select></label>
         <div class="filter-actions"><button type="button" class="btn" id="reset-filters">重 置</button><button class="btn primary">查 询</button><button type="button" class="link" id="expand" aria-controls="extra" aria-expanded="false">展开 ⌄</button></div>
         <div class="extra" id="extra" hidden><label class="field-inline">UID <input name="uid" inputmode="numeric" placeholder="请输入 UID"></label><label class="field-inline">期望赛道 <select name="target" id="filter-track"></select></label></div>
       </form>
@@ -82,8 +81,7 @@ const $ = selector => document.querySelector(selector);
 const tracks = ['手书', 'oc', 'COS', '素材混剪', '同人生活', '娱乐混剪', '漫剧'];
 const minReasonLength = 5;
 const maxReasonLength = 150;
-const stages = ['首批灰度', '扩大灰度', '全量开放'];
-const statuses = {'待处理':'pending','通过':'passed','驳回':'rejected'};
+const statuses = {'待处理':'pending','通过':'passed','驳回':'rejected','已修改':'passed'};
 const seedPeople = [
   ['9100000001','卡卡影集','素材混剪',0], ['9100000002','晴天片场','娱乐混剪',0],
   ['9100000003','路过的光','娱乐混剪',1], ['9100000004','周末放映室','未识别',1],
@@ -102,7 +100,6 @@ const seedCases = [
 ];
 function seed() {
   return {
-    stage: 0,
     people: Object.fromEntries(seedPeople.map(([id,name,track,batch]) => [id,{id,name,track,batch,changes:[]}])),
     cases: seedCases.map(([id,index,subject,before,target,appeal,time,status]) => ({
       id, uid:seedPeople[index][0], period:index===7?'第3期':'第4期', subject,before,target,appeal,status,
@@ -117,7 +114,7 @@ const storageKey = 'video-appeal-track-and-feedback-demo-v1';
 function readState() {
   try {
     const value = JSON.parse(localStorage.getItem(storageKey));
-    if (value && Number.isInteger(value.stage) && stages[value.stage] && value.people && Array.isArray(value.cases)) return value;
+    if (value && value.people && Array.isArray(value.cases)) return value;
   } catch {}
   return seed();
 }
@@ -137,7 +134,6 @@ const canChangeTrack = (target,current) => tracks.includes(target) && target!==c
 const reasonLength = value => [...value.replace(/\s/g,'')].length;
 const badge = status => `<span class="status ${statuses[status]}">${esc(status)}</span>`;
 const facts = pairs => `<dl class="facts">${pairs.map(([key,value])=>`<dt>${esc(key)}</dt><dd>${esc(value || '—')}</dd>`).join('')}</dl>`;
-const available = (person,stage=state.stage) => person.batch <= stage;
 const findCase = id => state.cases.find(item => item.id === id);
 const dateTime = () => new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Shanghai',dateStyle:'short',timeStyle:'medium'}).format(new Date());
 
@@ -160,11 +156,10 @@ function save(change) {
 }
 function renderAdmin() {
   const active = state.cases.filter(item => Object.entries(filters).every(([key,value]) => !value || (key==='uid'?item.uid.includes(value):item[key]===value)));
-  $('#rollout').textContent = `改赛道灰度 · ${stages[state.stage]}`;
   $('#rows').innerHTML = active.map(item => {
     const person = state.people[item.uid];
     const review = item.status==='待处理'
-      ? `<button class="link" data-action="approve">通过</button><button class="link danger" data-action="reject">驳回并修改</button>`
+      ? `<button class="link" data-action="approve">通过</button><button class="link danger" data-action="reject">驳回</button><button class="link" data-action="modify">修改</button>`
       : `<button class="link" data-action="detail">查看</button>`;
     return `<tr data-id="${item.id}"><td>${esc(item.period)}</td><td>${badge(item.status)}</td><td>${esc(item.uid)}</td><td><span class="clip" title="${esc(person.name)}">${esc(person.name)}</span></td><td>${esc(item.id)}</td><td><button class="link subject" title="${esc(item.subject)}" data-action="detail">${esc(item.subject)}</button></td><td>${esc(item.before)}</td><td>${esc(person.track)}</td><td>${esc(item.target)}</td><td><span class="clip" title="${esc(item.appeal)}">${esc(item.appeal)}</span></td><td>${esc(item.submitted)}</td><td>${esc(item.reviewer || '—')}</td><td><div class="actions">${review}</div></td></tr>`;
   }).join('');
@@ -180,8 +175,8 @@ function renderCreator() {
   const history = state.cases.filter(item=>item.uid===creatorUid);
   $('#creator-history').innerHTML = history.map(item=>{
     const feedback = item.adjustedTrack
-      ? `<p class="feedback"><strong>申诉结果私信</strong>${esc(`您的申诉未通过。经审核，您的赛道已调整为「${item.adjustedTrack}」，理由是${item.reason}`)}</p>`
-      : item.reason ? `<p class="feedback"><strong>驳回理由</strong>${esc(item.reason)}</p>` : '';
+      ? `<div class="feedback"><strong>申诉结果私信</strong><p>${esc(`亲爱的「${person.name}」，审核时，我们发现您的作品更符合「${item.adjustedTrack}」的创作方向，已为您调整至该赛道。期待在这里看到您的更多作品！`)}</p><p>调整原因　${esc(item.reason)}</p><button class="link" data-case-detail="${esc(item.id)}">查看详情</button></div>`
+      : '';
     return `<article class="history-item"><div class="history-head"><strong>${esc(item.subject)}</strong>${badge(item.status)}</div><p class="minor">期望赛道 ${esc(item.target)} · 提交于 ${esc(item.submitted)}</p>${feedback}</article>`;
   }).join('') || '<p class="empty">暂无申诉记录</p>';
 }
@@ -197,7 +192,7 @@ function showCreator(uid=creatorUid) {
 function showAdmin() {
   $('#creator').hidden = true;
   $('#admin').hidden = false;
-  $('#creator-preview').focus();
+  $('#approval-title').focus();
 }
 
 const cancel = '<button type="button" class="btn" data-cancel>取消</button>';
@@ -233,64 +228,14 @@ $('#close').onclick = () => dialog.close();
 dialog.addEventListener('click',event=>{if(event.target===dialog) dialog.close();});
 window.addEventListener('resize',()=>{if(dialog.open && dialogMode==='approve') dialog.close();});
 
-function openRollout() {
-  const people = Object.values(state.people);
-  const descriptions = ['首批名单','首批和第二批名单','全部演示账号'];
-  const choices = stages.map((stage,index)=>`<label class="choice"><input type="radio" name="stage" value="${index}"${index===state.stage?' checked':''}><span><b>${stage} · ${people.filter(person=>available(person,index)).length}/${people.length} 人</b><span class="hint">${descriptions[index]}</span></span></label>`).join('');
-  openModal('rollout','改赛道灰度范围',`<p class="notice">灰度范围控制哪些用户可手动改赛道。调整范围后，已保存的赛道继续生效。</p>${choices}${error}`,cancel+submit('保存范围'),()=>{
-    const selected = Number($('#dialog-body input:checked').value);
-    if (!save(next=>{next.stage=selected;})) return setError('保存失败，请重试。');
-    dialog.close();
-    toast(`灰度范围已更新为${stages[selected]}`);
-  });
-}
-function openTrack() {
-  let person = null;
-  openModal('track','手动改赛道',`
-    <p class="notice">保存后立即更新用户当前赛道，创作者无需重新申请。</p>
-    <div class="form-field"><label for="track-uid">用户 UID</label><div class="actions"><input id="track-uid" inputmode="numeric" placeholder="输入完整 UID" list="demo-accounts" style="flex:1;min-width:0"><button class="btn" type="button" id="lookup">查询用户</button></div><datalist id="demo-accounts">${Object.values(state.people).map(account=>`<option value="${account.id}" label="${esc(account.name)}"></option>`).join('')}</datalist></div>
-    <div id="track-info"></div><div class="form-field" id="track-field" hidden><label for="track-target"><span class="required">*</span> 目标赛道</label><select id="track-target"></select></div>${error}<div id="track-log"></div>`,cancel+submit('确认修改'),()=>{
-      if (!person || !available(person)) return;
-      const target = $('#track-target').value;
-      if (!canChangeTrack(target,person.track)) { setError('请选择与当前赛道不同的目标赛道。'); $('#track-target').focus(); return; }
-      if (!save(next=>{
-        const account=next.people[person.id];
-        account.changes.unshift({before:account.track,after:target,time:dateTime()});
-        account.track=target;
-      })) return setError('修改失败，请重试。');
-      creatorUid = person.id;
-      dialog.close();
-      toast(`已将「${person.name}」的赛道修改为${target}`);
-    });
-  const input = $('#track-uid');
-  const display = () => {
-    $('#track-info').innerHTML = person ? facts([['用户昵称',person.name],['当前赛道',person.track]])+(available(person)?'':'<p class="notice warning">该用户暂未纳入当前灰度范围。</p>') : '';
-    $('#track-field').hidden = !person || !available(person);
-    $('#dialog-foot [type=submit]').disabled = !person || !available(person);
-    $('#track-target').innerHTML = trackOptions(person?.track);
-    $('#track-log').innerHTML = person?.changes.length?`<div class="log"><strong>手动变更记录</strong><ul>${person.changes.map(change=>`<li>${esc(change.before)} → ${esc(change.after)} <span class="minor">${esc(change.time)} · 演示运营</span></li>`).join('')}</ul></div>`:'';
-  };
-  const lookup = () => {
-    person = Object.hasOwn(state.people,input.value.trim()) ? state.people[input.value.trim()] : null;
-    setError(person?'':input.value.trim()?'未找到该 UID 对应的用户。':'请输入用户 UID。');
-    display();
-    if (person && available(person)) $('#track-target').focus();
-  };
-  $('#lookup').onclick = lookup;
-  input.addEventListener('input',()=>{person=null;setError('');display();});
-  input.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();lookup();}});
-  $('#track-target').addEventListener('change',()=>setError(''));
-  display();
-  input.focus();
-}
-
 function finishReview(id,{status,reason='',adjustedTrack=''}) {
   const item = findCase(id);
   if (!item || item.status!=='待处理') { dialog.close(); toast('该申诉已处理，请刷新查看结果。',true); return; }
   if (!save(next=>{
     const record = next.cases.find(entry=>entry.id===id);
     Object.assign(record,{status,reason,adjustedTrack,reviewer:'演示运营',reviewed:dateTime()});
-    next.people[record.uid].track = adjustedTrack || record.target;
+    if (adjustedTrack) next.people[record.uid].track = adjustedTrack;
+    if (status==='通过') next.people[record.uid].track = record.target;
   })) {
     if ($('#form-error')) setError('保存失败，请重试。');
     else {dialog.close();toast('保存失败，请重试。',true);}
@@ -298,40 +243,45 @@ function finishReview(id,{status,reason='',adjustedTrack=''}) {
   }
   creatorUid = item.uid;
   dialog.close();
-  toast(adjustedTrack?'申诉已驳回，赛道已调整。':'申诉已通过，当前赛道已同步。');
+  toast({通过:'申诉已通过。',驳回:'申诉已驳回。',已修改:'赛道已修改，可在申诉详情预览私信。'}[status]);
 }
 function openApprove(item,anchor) {
   const current = state.people[item.uid].track;
   const change = current===item.target?`当前赛道为${current}`:`${current} → ${item.target}`;
   openModal('approve','通过申诉',`<p class="confirm-text"><span class="warn-dot" aria-hidden="true">!</span>确定通过该申诉吗？</p><p class="hint">${esc(change)}</p>`,cancel+submit('确定'),()=>finishReview(item.id,{status:'通过'}),anchor);
 }
-function openReject(item) {
+function openReviewForm(item, modifying) {
   const current = state.people[item.uid].track;
-  openModal('reject','驳回并修改',`${facts([['申诉稿件',item.subject],['当前赛道',current],['期望赛道',item.target]])}
-    <div class="form-field"><label for="review-track"><span class="required">*</span> 目标赛道</label><select id="review-track" aria-required="true">${trackOptions(current)}</select></div>
-    <div class="form-field"><label for="reason"><span class="required">*</span> 调整理由</label><textarea id="reason" maxlength="${maxReasonLength}" placeholder="填写本次调整的具体原因" aria-required="true" aria-describedby="reason-limit form-error"></textarea><p class="hint" id="reason-limit">至少 ${minReasonLength} 字（空白不计），最多 ${maxReasonLength} 字。赛道和理由将通过私信告知创作者。</p></div>${error}`,cancel+submit('确认驳回并修改'),()=>{
-      const trackField = $('#review-track');
-      const reasonField = $('#reason');
-      const adjustedTrack = trackField.value;
-      const reason = reasonField.value.trim();
-      if (!canChangeTrack(adjustedTrack,state.people[item.uid].track)) { setError('请选择与当前赛道不同的目标赛道。'); trackField.focus(); return; }
-      if (!reason) { setError('请填写调整理由。'); reasonField.focus(); return; }
-      if (reasonLength(reason)<minReasonLength) { setError(`调整理由至少填写 ${minReasonLength} 字，空白不计。`); reasonField.focus(); return; }
-      if (reasonField.value.length>maxReasonLength) { setError(`调整理由最多填写 ${maxReasonLength} 字。`); reasonField.focus(); return; }
-      finishReview(item.id,{status:'驳回',reason,adjustedTrack});
-    });
-  $('#review-track').addEventListener('change',()=>setError(''));
+  const title = modifying ? '修改赛道' : '驳回申诉';
+  const reasonLabel = modifying ? '调整理由' : '驳回原因';
+  const trackField = modifying ? `<div class="form-field"><label for="review-track"><span class="required">*</span> 目标赛道</label><select id="review-track" aria-required="true">${trackOptions(current)}</select></div>` : "";
+  const hint = `至少 ${minReasonLength} 字（空白不计），最多 ${maxReasonLength} 字。${modifying?"赛道和理由将通过私信告知创作者。":""}`;
+  openModal(modifying?'modify':'reject',title,`${facts([['申诉稿件',item.subject],['当前赛道',current],['期望赛道',item.target]])}
+    ${trackField}
+    <div class="form-field"><label for="reason"><span class="required">*</span> ${reasonLabel}</label><textarea id="reason" maxlength="${maxReasonLength}" placeholder="请填写${reasonLabel}" aria-required="true" aria-describedby="reason-limit form-error"></textarea><p class="hint" id="reason-limit">${hint}</p></div>${error}`,cancel+submit(modifying?"确认修改":"确认驳回"),()=>{
+    const target = $('#review-track');
+    const reasonField = $('#reason');
+    const adjustedTrack = target?.value || '';
+    const reason = reasonField.value.trim();
+    if (modifying && !canChangeTrack(adjustedTrack,state.people[item.uid].track)) { setError('请选择与当前赛道不同的目标赛道。'); target.focus(); return; }
+    if (!reason) { setError(`请填写${reasonLabel}。`); reasonField.focus(); return; }
+    if (reasonLength(reason)<minReasonLength) { setError(`${reasonLabel}至少填写 ${minReasonLength} 字，空白不计。`); reasonField.focus(); return; }
+    if (reasonField.value.length>maxReasonLength) { setError(`${reasonLabel}最多填写 ${maxReasonLength} 字。`); reasonField.focus(); return; }
+    finishReview(item.id,{status:modifying?'已修改':'驳回',reason,adjustedTrack});
+  });
+  $('#review-track')?.addEventListener('change',()=>setError(''));
   $('#reason').addEventListener('input',()=>setError(''));
-  $('#review-track').focus();
+  ($('#review-track') || $('#reason')).focus();
 }
-function openDetail(item) {
+function openDetail(item, fromCreator=false) {
   const person = state.people[item.uid];
   const pairs = [['用户',`${person.name}（${person.id}）`],['申诉稿件',item.subject],['状态',item.status],['申诉前赛道',item.before],['当前赛道',person.track],['期望赛道',item.target],['申诉理由',item.appeal],['提交时间',item.submitted]];
   if (item.reviewer) pairs.push(['审核人',item.reviewer],['审核时间',item.reviewed]);
   if (item.adjustedTrack) pairs.push(['调整后赛道',item.adjustedTrack]);
-  if (item.reason) pairs.push([item.adjustedTrack?'调整理由':'驳回理由',item.reason]);
-  openModal('detail','申诉详情',facts(pairs),`${cancel}<button class="btn primary" type="button" id="preview-account">查看创作者端</button>`);
-  $('#preview-account').onclick = () => {dialog.close();showCreator(item.uid);};
+  if (item.reason) pairs.push([item.adjustedTrack?'调整理由':'驳回原因',item.reason]);
+  const preview = item.adjustedTrack && !fromCreator ? '<button class="btn primary" type="button" id="preview-account">预览私信</button>' : '';
+  openModal('detail','申诉详情',facts(pairs),cancel+preview);
+  if (preview) $('#preview-account').onclick = () => {dialog.close();showCreator(item.uid);};
 }
 
 $('#filter-track').innerHTML = options(tracks);
@@ -350,17 +300,18 @@ $('#expand').onclick = event => {
 $('#refresh').onclick = () => {state=readState();render();toast('列表已刷新');};
 $('#density').onclick = event => event.currentTarget.setAttribute('aria-pressed',$('#table-wrap').classList.toggle('compact'));
 $('#approval-nav').onclick = () => $('h1').scrollIntoView({block:'nearest'});
-$('#creator-preview').onclick = () => showCreator();
 $('#back').onclick = showAdmin;
 $('#creator-account').onchange = event => {creatorUid=event.target.value;renderCreator();};
-$('#manual').onclick = () => openTrack();
-$('#rollout').onclick = openRollout;
 $('#rows').addEventListener('click',event=>{
   const button = event.target.closest('button[data-action]');
   if (!button) return;
   const item = findCase(button.closest('tr').dataset.id);
-  const actions = {approve:()=>openApprove(item,button),reject:()=>openReject(item),detail:()=>openDetail(item)};
+  const actions = {approve:()=>openApprove(item,button),reject:()=>openReviewForm(item,false),modify:()=>openReviewForm(item,true),detail:()=>openDetail(item)};
   actions[button.dataset.action]();
+});
+$('#creator-history').addEventListener('click',event=>{
+  const button = event.target.closest('[data-case-detail]');
+  if (button) openDetail(findCase(button.dataset.caseDetail),true);
 });
 window.addEventListener('storage',event=>{if(event.key===storageKey){state=readState();if(dialog.open)dialog.close();render();}});
 render();
