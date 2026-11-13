@@ -121,7 +121,6 @@ function readState() {
 let state = readState();
 let filters = {};
 let creatorUid = seedPeople[1][0];
-let dialogMode = '';
 let toastTimer;
 const dialog = $('#dialog');
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[char]);
@@ -202,8 +201,7 @@ function setError(message) {
   $('#form-error').textContent = message;
   $('#form-error').hidden = !message;
 }
-function openModal(mode,title,body,footer,onSubmit,anchor) {
-  dialogMode = mode;
+function openModal(title,body,footer,onSubmit,anchor) {
   dialog.className = anchor?'confirm':'';
   dialog.removeAttribute('style');
   $('#dialog-head').hidden = Boolean(anchor);
@@ -226,7 +224,7 @@ function openModal(mode,title,body,footer,onSubmit,anchor) {
 }
 $('#close').onclick = () => dialog.close();
 dialog.addEventListener('click',event=>{if(event.target===dialog) dialog.close();});
-window.addEventListener('resize',()=>{if(dialog.open && dialogMode==='approve') dialog.close();});
+window.addEventListener('resize',()=>{if(dialog.open && dialog.classList.contains('confirm')) dialog.close();});
 
 function finishReview(id,{status,reason='',adjustedTrack=''}) {
   const item = findCase(id);
@@ -248,30 +246,30 @@ function finishReview(id,{status,reason='',adjustedTrack=''}) {
 function openApprove(item,anchor) {
   const current = state.people[item.uid].track;
   const change = current===item.target?`当前赛道为${current}`:`${current} → ${item.target}`;
-  openModal('approve','通过申诉',`<p class="confirm-text"><span class="warn-dot" aria-hidden="true">!</span>确定通过该申诉吗？</p><p class="hint">${esc(change)}</p>`,cancel+submit('确定'),()=>finishReview(item.id,{status:'通过'}),anchor);
+  openModal('通过申诉',`<p class="confirm-text"><span class="warn-dot" aria-hidden="true">!</span>确定通过该申诉吗？</p><p class="hint">${esc(change)}</p>`,cancel+submit('确定'),()=>finishReview(item.id,{status:'通过'}),anchor);
 }
-function openReviewForm(item, modifying) {
+function openReject(item,anchor) {
+  openModal('驳回申诉','<p class="confirm-text"><span class="warn-dot" aria-hidden="true">!</span>确定驳回该申诉吗？</p>',cancel+submit('确定'),()=>finishReview(item.id,{status:'驳回'}),anchor);
+}
+function openModify(item) {
   const current = state.people[item.uid].track;
-  const title = modifying ? '修改赛道' : '驳回申诉';
-  const reasonLabel = modifying ? '调整理由' : '驳回原因';
-  const trackField = modifying ? `<div class="form-field"><label for="review-track"><span class="required">*</span> 目标赛道</label><select id="review-track" aria-required="true">${trackOptions(current)}</select></div>` : "";
-  const hint = `至少 ${minReasonLength} 字（空白不计），最多 ${maxReasonLength} 字。${modifying?"赛道和理由将通过私信告知创作者。":""}`;
-  openModal(modifying?'modify':'reject',title,`${facts([['申诉稿件',item.subject],['当前赛道',current],['期望赛道',item.target]])}
-    ${trackField}
-    <div class="form-field"><label for="reason"><span class="required">*</span> ${reasonLabel}</label><textarea id="reason" maxlength="${maxReasonLength}" placeholder="请填写${reasonLabel}" aria-required="true" aria-describedby="reason-limit form-error"></textarea><p class="hint" id="reason-limit">${hint}</p></div>${error}`,cancel+submit(modifying?"确认修改":"确认驳回"),()=>{
+  const hint = `至少 ${minReasonLength} 字（空白不计），最多 ${maxReasonLength} 字。赛道和理由将通过私信告知创作者。`;
+  openModal('修改赛道',`${facts([['申诉稿件',item.subject],['当前赛道',current],['期望赛道',item.target]])}
+    <div class="form-field"><label for="review-track"><span class="required">*</span> 目标赛道</label><select id="review-track" aria-required="true">${trackOptions(current)}</select></div>
+    <div class="form-field"><label for="reason"><span class="required">*</span> 调整理由</label><textarea id="reason" maxlength="${maxReasonLength}" placeholder="请填写调整理由" aria-required="true" aria-describedby="reason-limit form-error"></textarea><p class="hint" id="reason-limit">${hint}</p></div>${error}`,cancel+submit('确认修改'),()=>{
     const target = $('#review-track');
     const reasonField = $('#reason');
-    const adjustedTrack = target?.value || '';
+    const adjustedTrack = target.value;
     const reason = reasonField.value.trim();
-    if (modifying && !canChangeTrack(adjustedTrack,state.people[item.uid].track)) { setError('请选择与当前赛道不同的目标赛道。'); target.focus(); return; }
-    if (!reason) { setError(`请填写${reasonLabel}。`); reasonField.focus(); return; }
-    if (reasonLength(reason)<minReasonLength) { setError(`${reasonLabel}至少填写 ${minReasonLength} 字，空白不计。`); reasonField.focus(); return; }
-    if (reasonField.value.length>maxReasonLength) { setError(`${reasonLabel}最多填写 ${maxReasonLength} 字。`); reasonField.focus(); return; }
-    finishReview(item.id,{status:modifying?'已修改':'驳回',reason,adjustedTrack});
+    if (!canChangeTrack(adjustedTrack,state.people[item.uid].track)) { setError('请选择与当前赛道不同的目标赛道。'); target.focus(); return; }
+    if (!reason) { setError('请填写调整理由。'); reasonField.focus(); return; }
+    if (reasonLength(reason)<minReasonLength) { setError(`调整理由至少填写 ${minReasonLength} 字，空白不计。`); reasonField.focus(); return; }
+    if (reasonField.value.length>maxReasonLength) { setError(`调整理由最多填写 ${maxReasonLength} 字。`); reasonField.focus(); return; }
+    finishReview(item.id,{status:'已修改',reason,adjustedTrack});
   });
-  $('#review-track')?.addEventListener('change',()=>setError(''));
+  $('#review-track').addEventListener('change',()=>setError(''));
   $('#reason').addEventListener('input',()=>setError(''));
-  ($('#review-track') || $('#reason')).focus();
+  $('#review-track').focus();
 }
 function openDetail(item, fromCreator=false) {
   const person = state.people[item.uid];
@@ -280,7 +278,7 @@ function openDetail(item, fromCreator=false) {
   if (item.adjustedTrack) pairs.push(['调整后赛道',item.adjustedTrack]);
   if (item.reason) pairs.push([item.adjustedTrack?'调整理由':'驳回原因',item.reason]);
   const preview = item.adjustedTrack && !fromCreator ? '<button class="btn primary" type="button" id="preview-account">预览私信</button>' : '';
-  openModal('detail','申诉详情',facts(pairs),cancel+preview);
+  openModal('申诉详情',facts(pairs),cancel+preview);
   if (preview) $('#preview-account').onclick = () => {dialog.close();showCreator(item.uid);};
 }
 
@@ -306,7 +304,7 @@ $('#rows').addEventListener('click',event=>{
   const button = event.target.closest('button[data-action]');
   if (!button) return;
   const item = findCase(button.closest('tr').dataset.id);
-  const actions = {approve:()=>openApprove(item,button),reject:()=>openReviewForm(item,false),modify:()=>openReviewForm(item,true),detail:()=>openDetail(item)};
+  const actions = {approve:()=>openApprove(item,button),reject:()=>openReject(item,button),modify:()=>openModify(item),detail:()=>openDetail(item)};
   actions[button.dataset.action]();
 });
 $('#creator-history').addEventListener('click',event=>{
