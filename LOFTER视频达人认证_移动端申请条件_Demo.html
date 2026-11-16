@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LOFTER 视频达人认证 · 移动端 Demo</title>
+<style>
+  :root {
+    font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: #2b2b2b;
+    background: #e8eceb;
+    --accent: #12c3bf;
+    --accent-text: #087f7b;
+    --surface: #f2f2f2;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  button, select { font: inherit; color: inherit; }
+  button { border: 0; cursor: pointer; }
+  button:disabled { cursor: default; }
+  :focus-visible { outline: 2px solid var(--accent-text); outline-offset: -3px; }
+  .phone {
+    width: min(430px, 100%);
+    height: min(932px, calc(100dvh - 36px));
+    margin: 18px auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    border-radius: 30px;
+    background: var(--surface);
+    box-shadow: 0 18px 56px #203b3527, 0 0 0 1px #203b3510;
+  }
+  header { flex: none; background: #fff; }
+  .bar { display: grid; grid-template-columns: 68px 1fr 68px; align-items: center; min-height: 60px; padding: 4px 10px 0; }
+  h1 { margin: 0; font-size: 18px; text-align: center; }
+  .back { width: 42px; height: 42px; background: transparent; border-radius: 50%; }
+  .back::before { content: ""; display: inline-block; width: 9px; height: 9px; border: solid currentColor; border-width: 0 0 2.5px 2.5px; transform: rotate(45deg); }
+  .demo-open { justify-self: end; min-height: 34px; background: #f0f7f6; border-radius: 20px; padding: 0 11px; font-size: 12px; color: var(--accent-text); }
+  .steps { display: flex; justify-content: space-between; margin: 0; padding: 13px 12px 21px; list-style: none; }
+  .steps li { flex: 1; position: relative; display: grid; justify-items: center; gap: 8px; color: #bfbfbf; font-size: 14px; }
+  .steps li:not(:first-child)::before { content: ""; position: absolute; height: 1px; background: #e0e0e0; width: calc(100% - 56px); top: 22px; left: calc(-50% + 28px); }
+  .steps li.reached { color: #2b2b2b; }
+  .steps span { display: grid; place-items: center; width: 45px; height: 45px; border-radius: 50%; background: var(--surface); font-size: 16px; font-weight: 700; }
+  main { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; padding: 20px 18px 24px; }
+  h2 { font-size: 17px; margin: 0; }
+  .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 13px; }
+  .section-heading h2 span { font-weight: 400; font-size: 14px; margin-inline-start: 3px; }
+  .info { flex: none; width: 38px; height: 36px; border-radius: 20px; background: transparent; color: #777; font-size: 16px; }
+  .fields h2 { text-align: center; margin: 9px 0 22px; }
+  .field-list, .conditions { list-style: none; padding: 0; margin: 0; display: grid; gap: 9px; }
+  .field-list { gap: 16px; padding: 0 9px; }
+  .choice { display: flex; align-items: center; justify-content: center; text-align: center; width: 100%; border: 2px solid transparent; border-radius: 999px; background: #fff; min-height: 61px; padding: 12px; font-size: 15px; font-weight: 600; }
+  .choice:disabled { color: #5f5f5f; }
+  .field-list .choice { min-height: 78px; gap: 12px; font-size: 18px; }
+  .choice[aria-pressed="true"] { color: var(--accent-text); border-color: var(--accent); }
+  .field-list .choice[aria-pressed="true"] { color: #8f50e2; border-color: #a065ff; }
+  .field-icon { font-size: 21px; line-height: 1; }
+  .text-icon { color: #20b9d9; }
+  .picture-icon { color: #ef5485; }
+  .video-icon { color: #a065ff; background: #f3eaff; border-radius: 7px; padding: 5px 6px 5px 7px; font-size: 15px; }
+  .field-note { margin: 18px 0 0; text-align: center; font-size: 13px; color: #777; }
+  .titles { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+  .titles button:nth-child(n+3) { grid-column: 1 / -1; }
+  .text-button { color: #777; background: transparent; padding: 12px 8px; font-size: 14px; }
+  .choose-again { display: block; margin: 21px auto 0; }
+  .condition { border-radius: 15px; background: #fff; padding: 13px 14px 12px; }
+  .condition h3 { font-size: 15px; margin: 0 0 10px; line-height: 1.4; }
+  .metric { display: flex; gap: 14px; align-items: center; }
+  .track { flex: 1; height: 7px; background: #eaeaea; border-radius: 10px; overflow: hidden; }
+  .fill { display: block; height: 100%; border-radius: inherit; background: #bfbfbf; }
+  .met .fill { background: var(--accent); }
+  .value { min-width: 64px; text-align: right; font-size: 12px; color: #707070; font-variant-numeric: tabular-nums; }
+  .met .value { color: var(--accent-text); }
+  .notice { padding: 10px 12px; margin: 0 0 12px; border-radius: 10px; color: #8a421d; background: #fff1e5; font-size: 13px; line-height: 1.5; }
+  footer { flex: none; border-radius: 19px 19px 0 0; background: #fff; box-shadow: 0 -5px 18px #00000004; padding: 10px 18px max(17px, env(safe-area-inset-bottom)); }
+  .primary { min-height: 51px; border-radius: 999px; width: 100%; background: var(--accent); color: #153737; font-size: 17px; font-weight: 650; }
+  .primary:disabled { background: #f3f3f3; color: #aaa; }
+  .result { text-align: center; padding: 47px 10px 20px; }
+  .result-mark { display: grid; place-items: center; margin: 0 auto 16px; width: 56px; height: 56px; border-radius: 50%; background: #d9f5f2; color: var(--accent-text); font-size: 26px; }
+  .result p { font-size: 14px; color: #666; }
+  dialog { width: min(392px, calc(100% - 32px)); max-height: calc(100dvh - 32px); border: 0; border-radius: 20px; padding: 20px; color: inherit; box-shadow: 0 16px 54px #0002; }
+  dialog::backdrop { background: #0c292566; }
+  dialog p { font-size: 14px; color: #555; line-height: 1.6; }
+  .dialog-heading { display: flex; justify-content: space-between; align-items: center; margin: 0 0 8px; }
+  .close { background: var(--surface); border-radius: 50%; width: 32px; height: 32px; font-size: 19px; }
+  .scenario-list { display: grid; gap: 7px; }
+  .scenario { background: #f5f5f5; border: 1px solid transparent; border-radius: 11px; padding: 10px 12px; text-align: left; font-size: 14px; }
+  .scenario[aria-pressed="true"] { color: var(--accent-text); background: #effaf9; border-color: #8addd8; }
+  .scenario:disabled { opacity: .55; }
+  .reset { margin-top: 8px; min-height: 40px; }
+  @media (max-width: 480px) {
+    .phone { width: 100%; height: 100dvh; margin: 0; border-radius: 0; box-shadow: none; }
+    .bar { padding-top: env(safe-area-inset-top); }
+  }
+  @media (max-width: 350px) {
+    main { padding-inline: 12px; }
+    .titles .choice { padding-inline: 7px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <header>
+      <div class="bar">
+        <button type="button" id="back" class="back" aria-label="返回" hidden></button>
+        <h1 style="grid-column: 2">LOFTER认证申请</h1>
+        <button type="button" id="demo-open" class="demo-open" aria-haspopup="dialog">演示</button>
+      </div>
+      <ol class="steps" aria-label="申请进度">
+        <li><span>01</span>选择称号</li>
+        <li><span>02</span>满足条件</li>
+        <li><span>03</span>等待审核</li>
+      </ol>
+    </header>
+    <main id="screen" aria-label="认证申请内容"></main>
+    <footer><button id="primary" type="button" class="primary"></button></footer>
+  </div>
+
+  <dialog id="details" aria-labelledby="details-title">
+    <div class="dialog-heading">
+      <h2 id="details-title"></h2>
+      <form method="dialog"><button type="submit" class="close" aria-label="关闭">×</button></form>
+    </div>
+    <div id="details-body"></div>
+  </dialog>
+
+<script>
+  const titles = ['游戏', '娱乐', '二次元', '搞笑幽默', '生活'].map(name => `LOFTER${name}视频达人`);
+  const criteria = [
+    ['累计粉丝数', 1000],
+    ['单条视频最高累计热度', 80],
+    ['视频作品累计热度', 600],
+    ['单条视频最高累计播放量', 1000],
+    ['视频作品累计播放量', 6000],
+    ['近6个月发布公开可见视频数量', 5],
+  ];
+  const scenarios = {
+    screenshot: { label: '截图数据 · 0 项达标', values: [0, 0, 0, 34, 35, 0] },
+    fourVideos: { label: '公开视频 4 条 · 3 项达标', values: [1100, 90, 650, 34, 35, 4] },
+    fiveVideos: { label: '公开视频 5 条 · 4 项达标', values: [1100, 90, 650, 34, 35, 5] },
+    otherFour: { label: '公开视频 4 条 · 其余条件中 4 项达标', values: [1100, 90, 650, 1000, 1200, 4] },
+    allSix: { label: '6 项全部达标', values: [1100, 90, 650, 1100, 6500, 6] },
+    recheck: { label: '提交时复核降为 3 项达标', values: [1100, 90, 650, 34, 35, 5], recheckAs: 'fourVideos' },
+  };
+  const requiredCount = 4;
+  const storageKey = 'lofter-video-cert-demo-application-v1';
+  const screen = document.querySelector('#screen');
+  const primary = document.querySelector('#primary');
+  const back = document.querySelector('#back');
+  const demo = document.querySelector('#demo-open');
+  const dialog = document.querySelector('#details');
+  const dialogTitle = document.querySelector('#details-title');
+  const dialogBody = document.querySelector('#details-body');
+  const steps = [...document.querySelectorAll('.steps li')];
+  const sufficient = values => values.filter((value, index) => value >= criteria[index][1]).length >= requiredCount;
+  let saved = readApplication();
+  let page = saved ? 'review' : 'field';
+  let videoSelected = Boolean(saved);
+  let title = saved?.title ?? null;
+  let scenario = saved?.scenario ?? 'screenshot';
+  let notice = '';
+
+  function readApplication() {
+    try {
+      const application = JSON.parse(localStorage.getItem(storageKey));
+      if (titles.includes(application?.title) && Object.hasOwn(scenarios, application.scenario)) return application;
+    } catch { /* Start a new demo when storage is unavailable or invalid. */ }
+    return null;
+  }
+
+  function navigate(nextPage) {
+    page = nextPage;
+    render();
+    screen.scrollTop = 0;
+    screen.querySelector('h2')?.focus();
+  }
+
+  function render() {
+    const stepIndex = ['field', 'title'].includes(page) ? 0 : page === 'conditions' ? 1 : 2;
+    steps.forEach((step, index) => {
+      step.classList.toggle('reached', index <= stepIndex);
+      if (index === stepIndex) step.setAttribute('aria-current', 'step');
+      else step.removeAttribute('aria-current');
+    });
+    back.hidden = ['field', 'review'].includes(page);
+    if (page === 'field') {
+      screen.innerHTML = `<section class="fields">
+        <h2 tabindex="-1">选择你的主要创作领域</h2>
+        <ul class="field-list">
+          <li><button type="button" class="choice" disabled><span class="field-icon text-icon" aria-hidden="true">文</span>文字</button></li>
+          <li><button type="button" class="choice" disabled><span class="field-icon picture-icon" aria-hidden="true">▣</span>图片</button></li>
+          <li><button type="button" class="choice" data-action="video" aria-pressed="${videoSelected}"><span class="field-icon video-icon" aria-hidden="true">▶</span>视频</button></li>
+        </ul>
+        <p class="field-note">本演示可申请视频达人称号</p>
+      </section>`;
+    } else if (page === 'title') {
+      screen.innerHTML = `<div class="section-heading"><h2 tabindex="-1">选择你想申请的称号</h2><button type="button" class="text-button" data-action="title-info">称号介绍 ⓘ</button></div>
+        <div class="titles">${titles.map((name, index) => `<button type="button" class="choice" data-title="${index}" aria-pressed="${name === title}">${name}</button>`).join('')}</div>
+        <button type="button" class="text-button choose-again" data-action="choose-again">重新选择领域 ›</button>`;
+    } else if (page === 'conditions') {
+      const { values } = scenarios[scenario];
+      screen.innerHTML = `<div class="section-heading"><h2 tabindex="-1">申请条件 <span>（满足${requiredCount}个即可）</span></h2><button type="button" class="info" data-action="condition-info" aria-label="申请条件说明">ⓘ</button></div>
+        ${notice ? `<p class="notice" role="alert">${notice}</p>` : ''}
+        <ol class="conditions">${criteria.map(([label, limit], index) => {
+          const value = values[index];
+          const met = value >= limit;
+          const percentage = Math.min(value / limit * 100, 100);
+          return `<li class="condition${met ? ' met' : ''}">
+            <h3>${index + 1}、${label}</h3>
+            <div class="metric"><div class="track" aria-hidden="true"><span class="fill" style="width:${percentage}%"></span></div>
+              <span class="value" aria-label="${value}/${limit}，${met ? '已达标' : '未达标'}">${value}/${limit}</span></div>
+          </li>`;
+        }).join('')}</ol>`;
+    } else {
+      screen.innerHTML = `<section class="result">
+        <div class="result-mark" aria-hidden="true">✓</div>
+        <h2 tabindex="-1">申请已提交</h2>
+        <p>${saved.title}</p>
+        <p>等待审核</p>
+      </section>`;
+    }
+    primary.textContent = { field: '下一步', title: '下一步', conditions: '提交申请', review: '重新演示' }[page];
+    primary.disabled = (page === 'field' && !videoSelected) || (page === 'title' && !title) || (page === 'conditions' && !sufficient(scenarios[scenario].values));
+  }
+
+  function showDialog(heading, content) {
+    dialogTitle.textContent = heading;
+    dialogBody.innerHTML = content;
+    dialog.showModal();
+  }
+
+  function reset() {
+    try {
+      localStorage.removeItem(storageKey);
+    } catch {
+      showDialog('无法清除演示记录', '<p>当前浏览器限制了本地存储操作，请调整浏览器设置后重试。</p>');
+      return;
+    }
+    saved = null;
+    videoSelected = false;
+    title = null;
+    scenario = 'screenshot';
+    notice = '';
+    navigate('field');
+  }
+
+  screen.addEventListener('click', event => {
+    const button = event.target.closest('button');
+    if (!button || button.disabled) return;
+    if (button.hasAttribute('data-title')) {
+      title = titles[Number(button.dataset.title)];
+      screen.querySelectorAll('[data-title]').forEach(choice => choice.setAttribute('aria-pressed', String(choice === button)));
+      primary.disabled = false;
+    } else if (button.dataset.action === 'video') {
+      videoSelected = true;
+      button.setAttribute('aria-pressed', 'true');
+      primary.disabled = false;
+    } else if (button.dataset.action === 'choose-again') {
+      navigate('field');
+    } else if (button.dataset.action === 'title-info') {
+      showDialog('称号介绍', '<p>请选择与你主要创作内容相符的视频达人称号，下一步查看申请条件。</p>');
+    } else if (button.dataset.action === 'condition-info') {
+      showDialog('申请条件说明', `<p>6 项条件中，任意 ${requiredCount} 项达标即可提交申请。</p><p>近 6 个月发布的公开可见视频达到 5 条，该项达标。</p>`);
+    }
+  });
+
+  back.addEventListener('click', () => navigate(page === 'conditions' ? 'title' : 'field'));
+
+  primary.addEventListener('click', () => {
+    if (page === 'field' && videoSelected) navigate('title');
+    else if (page === 'title' && title) navigate('conditions');
+    else if (page === 'review') reset();
+    else if (page === 'conditions' && sufficient(scenarios[scenario].values)) {
+      const checkedScenario = scenarios[scenario].recheckAs ?? scenario;
+      if (!sufficient(scenarios[checkedScenario].values)) {
+        scenario = checkedScenario;
+        notice = '申请条件已更新，当前达标项数不足 4 项。';
+        navigate('conditions');
+        return;
+      }
+      const application = { title, scenario: checkedScenario };
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(application));
+      } catch {
+        notice = '无法保存演示申请，请检查浏览器的本地存储设置后重试。';
+        navigate('conditions');
+        return;
+      }
+      saved = application;
+      navigate('review');
+    }
+  });
+
+  demo.addEventListener('click', () => {
+    const sceneButtons = Object.entries(scenarios).map(([key, scene]) => `<button type="button" class="scenario" data-scenario="${key}" aria-pressed="${key === scenario}" ${saved ? 'disabled' : ''}>${scene.label}</button>`).join('');
+    const description = saved ? '本地已保存演示申请。重新演示后可切换场景。' : '选择一组模拟数据，进入申请条件页查看达标结果。各称号使用截图中的示例阈值。';
+    showDialog('演示场景', `<p>${description}</p><div class="scenario-list">${sceneButtons}</div><button type="button" class="text-button reset" data-reset>重新演示</button>`);
+  });
+
+  dialogBody.addEventListener('click', event => {
+    const button = event.target.closest('button');
+    if (!button || button.disabled) return;
+    if (button.hasAttribute('data-reset')) {
+      dialog.close();
+      reset();
+    } else if (button.hasAttribute('data-scenario')) {
+      scenario = button.dataset.scenario;
+      notice = '';
+      dialog.close();
+      if (page === 'conditions') navigate(page);
+    }
+  });
+
+  render();
+</script>
+</body>
+</html>
