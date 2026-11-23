@@ -1,1 +1,569 @@
-https://github.com/Chen-ya15536562212/creator-application-demo.git
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>视频合集排序 Demo</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: #e9e9e9;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC",
+      "Microsoft YaHei", sans-serif;
+    color: #222;
+  }
+
+  button { font: inherit; cursor: pointer; }
+
+  .phone {
+    position: relative;
+    width: min(100%, 390px);
+    height: 100dvh;
+    max-height: 844px;
+    min-height: 600px;
+    margin: auto;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .page {
+    height: 100%;
+    overflow-y: auto;
+    padding-bottom: 90px;
+    background: #fff;
+  }
+
+  .header {
+    height: 255px;
+    padding: 16px 15px 0;
+    color: white;
+    background: linear-gradient(135deg, #68524e, #80645e);
+  }
+
+  .status {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 25px 0 23px;
+    font-size: 17px;
+  }
+
+  .nav-side {
+    width: 20px;
+    font-size: 25px;
+    line-height: 1;
+  }
+
+  .collection {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+
+  .collection-cover {
+    width: 76px;
+    height: 76px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #b89b83, #493938);
+    color: rgba(255,255,255,.8);
+    font-size: 12px;
+  }
+
+  .collection-info { min-width: 0; }
+  .collection-name { margin-bottom: 8px; font-size: 17px; font-weight: 600; }
+  .author-line { font-size: 12px; color: #eee4e1; }
+
+  .badges { display: flex; gap: 5px; margin-top: 8px; }
+
+  .badge {
+    padding: 2px 9px;
+    border-radius: 20px;
+    background: rgba(255,255,255,.22);
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .stats {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 18px;
+    text-align: center;
+  }
+
+  .stat-value { font-size: 16px; font-weight: 600; }
+  .stat-label { margin-top: 3px; color: #e1d7d4; font-size: 11px; }
+
+  .content {
+    position: relative;
+    margin-top: -1px;
+    padding: 13px 15px 20px;
+    border-radius: 16px 16px 0 0;
+    background: #fff;
+  }
+
+  .tags {
+    display: flex;
+    gap: 7px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .tag {
+    flex-shrink: 0;
+    padding: 4px 9px;
+    border-radius: 20px;
+    background: #f5f5f5;
+    color: #999;
+    font-size: 12px;
+  }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    margin-top: 14px;
+    padding: 15px 4px;
+    border-top: 1px solid #eee;
+    color: #999;
+    font-size: 12px;
+  }
+
+  .sort {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 12px;
+  }
+
+  .sort-icon {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .article-count { margin-left: 8px; }
+
+  .view-toggle {
+    margin-left: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #bbb;
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  .post { padding: 7px 0 20px; }
+
+  .post-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #b79a87, #463334);
+  }
+
+  .author-name { font-size: 14px; }
+  .post-date { margin-top: 3px; color: #aaa; font-size: 11px; }
+
+  .follow {
+    margin-left: auto;
+    padding: 3px 10px;
+    border: 1px solid #72ccc6;
+    border-radius: 20px;
+    background: transparent;
+    color: #5abdb6;
+    font-size: 12px;
+  }
+
+  .post-title {
+    margin: 14px 0 8px;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .post-cover {
+    position: relative;
+    width: 67%;
+    aspect-ratio: 3 / 4;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 8px;
+    background: linear-gradient(145deg, #ad9580, #544441);
+    color: white;
+  }
+
+  .post:nth-child(even) .post-cover {
+    background: linear-gradient(145deg, #b5a38b, #67564f);
+  }
+
+  .cover-label {
+    color: rgba(255,255,255,.65);
+    font-size: 12px;
+  }
+
+  .play {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(0,0,0,.25);
+    font-size: 20px;
+  }
+
+  .cover-meta {
+    position: absolute;
+    right: 10px;
+    bottom: 9px;
+    left: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+  }
+
+  .footer {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    display: flex;
+    gap: 10px;
+    padding: 8px 15px 20px;
+    background: rgba(255,255,255,.96);
+  }
+
+  .footer button {
+    flex: 1;
+    height: 40px;
+    border: 0;
+    border-radius: 24px;
+    font-size: 15px;
+  }
+
+  .subscribed { background: #f4f4f4; color: #999; }
+  .start { background: #57c4bd; color: white; }
+
+  .player {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: none;
+    background: linear-gradient(155deg, #705852, #171313 65%);
+    color: white;
+  }
+
+  .player.visible { display: block; }
+
+  .player-top {
+    display: flex;
+    justify-content: space-between;
+    padding: 18px;
+    font-size: 13px;
+  }
+
+  .player-center {
+    position: absolute;
+    top: 25%;
+    width: 100%;
+    text-align: center;
+    color: rgba(255,255,255,.6);
+    font-size: 13px;
+  }
+
+  .sheet {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 15px 15px 22px;
+    border-radius: 15px 15px 0 0;
+    background: rgba(14,14,14,.97);
+  }
+
+  .sheet-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .sheet-title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .sheet-count { color: #888; font-size: 11px; font-weight: 400; }
+  .sheet-sort { color: #ccc; white-space: nowrap; }
+
+  .close {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: white;
+    font-size: 22px;
+  }
+
+  .sheet-list { margin-top: 12px; }
+
+  .sheet-item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 7px 0;
+  }
+
+  .thumb {
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #ad907e, #4c3937);
+    color: white;
+    font-size: 15px;
+  }
+
+  .sheet-item-info { min-width: 0; }
+
+  .sheet-item-title {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .sheet-item-meta { margin-top: 6px; color: #888; font-size: 10px; }
+
+  .sheet-footer { display: flex; gap: 8px; margin-top: 14px; }
+
+  .sheet-footer button {
+    padding: 10px 15px;
+    border-radius: 22px;
+    font-size: 12px;
+  }
+
+  .all-button { border: 0; background: #414141; color: white; }
+
+  .sheet-subscribed {
+    flex: 1;
+    border: 1px solid #2dbdb4;
+    background: transparent;
+    color: #2dbdb4;
+  }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="page">
+    <header class="header">
+      <div class="status"><span>11:13</span><span>● ▰ 81%</span></div>
+      <div class="nav">
+        <span class="nav-side">‹</span>
+        <span>合集</span>
+        <span class="nav-side">⋮</span>
+      </div>
+      <div class="collection">
+        <div class="collection-cover">合集封面</div>
+        <div class="collection-info">
+          <div class="collection-name">长夜既明</div>
+          <div class="author-line">山药葛根玉米粉 · 更新于 2 天前</div>
+          <div class="badges">
+            <span class="badge">视频合集热门榜 TOP8</span>
+            <span class="badge">近期有更新</span>
+          </div>
+        </div>
+      </div>
+      <div class="stats">
+        <div><div class="stat-value">42</div><div class="stat-label">订阅数</div></div>
+        <div><div class="stat-value">679</div><div class="stat-label">总热度</div></div>
+        <div><div class="stat-value">1136</div><div class="stat-label">浏览数</div></div>
+      </div>
+    </header>
+
+    <section class="content">
+      <div class="tags">
+        <span class="tag"># 视频星推计划</span>
+        <span class="tag"># 年上</span>
+        <span class="tag"># 青梅竹马</span>
+        <span class="tag"># 长夜既明</span>
+      </div>
+      <div class="toolbar">
+        <button class="sort" id="pageSort"></button>
+        <span class="article-count">· 3 篇文章</span>
+        <button class="view-toggle" id="viewToggle" aria-label="切换列表视图">☰</button>
+      </div>
+      <div id="posts"></div>
+    </section>
+  </div>
+
+  <div class="footer">
+    <button class="subscribed">已订阅</button>
+    <button class="start" id="start">开始阅读</button>
+  </div>
+
+  <section class="player" id="player">
+    <div class="player-top"><span>11:13</span><span>● ▰ 81%</span></div>
+    <div class="player-center">▶<br><br>视频播放区域</div>
+
+    <div class="sheet">
+      <div class="sheet-header">
+        <div class="sheet-title">▰ 合集 · 长夜既明 <span class="sheet-count">3/3</span></div>
+        <button class="sort sheet-sort" id="sheetSort"></button>
+        <button class="close" id="close" aria-label="关闭">×</button>
+      </div>
+      <div class="sheet-list" id="sheetList"></div>
+      <div class="sheet-footer">
+        <button class="all-button" id="showAll">查看全部</button>
+        <button class="sheet-subscribed">已订阅</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  const items = [
+    {
+      title: "少爷不懂，但是少爷主动【长夜既明>19>一念叩心】",
+      date: "11-14",
+      duration: "03:22",
+      plays: "14",
+      heat: "14"
+    },
+    {
+      title: "睡了！【长夜既明>20>冬日暖情】",
+      date: "11-15",
+      duration: "03:14",
+      plays: "122",
+      heat: "122"
+    },
+    {
+      title: "好像有什么不得了的大事发生？【长夜既明>21>暗流】",
+      date: "11-16",
+      duration: "04:48",
+      plays: "7.8 万",
+      heat: "250"
+    }
+  ];
+
+  const storageKey = "collection-38092531-sort";
+  let order = localStorage.getItem(storageKey) === "desc" ? "desc" : "asc";
+  let listView = false;
+
+  const player = document.getElementById("player");
+  const posts = document.getElementById("posts");
+
+  function sortMarkup() {
+    const arrow = order === "asc"
+      ? '<path d="M12 3v10m-2.5-2.5L12 13l2.5-2.5"/>'
+      : '<path d="M12 13V3m-2.5 2.5L12 3l2.5 2.5"/>';
+
+    return `<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true">
+      <path d="M2 4h6M2 8h5M2 12h4"/>${arrow}
+    </svg>${order === "asc" ? "正序" : "倒序"}`;
+  }
+
+  function render() {
+    const ordered = order === "asc" ? items : [...items].reverse();
+    document.getElementById("pageSort").innerHTML = sortMarkup();
+    document.getElementById("sheetSort").innerHTML = sortMarkup();
+
+    posts.innerHTML = ordered.map(item => listView
+      ? `<div class="sheet-item" style="color:#222;border-bottom:1px solid #eee;padding:14px 0">
+          <div class="thumb">▶</div>
+          <div class="sheet-item-info">
+            <div class="sheet-item-title">${item.title}</div>
+            <div class="sheet-item-meta">${item.heat} 热度</div>
+          </div>
+        </div>`
+      : `<article class="post">
+          <div class="post-author">
+            <div class="avatar"></div>
+            <div><div class="author-name">山药葛根玉米粉</div><div class="post-date">${item.date}</div></div>
+            <button class="follow">关注</button>
+          </div>
+          <div class="post-title">${item.title}</div>
+          <div class="post-cover">
+            <span class="cover-label">视频封面</span>
+            <span class="play">▶</span>
+            <div class="cover-meta"><span>▶ ${item.plays} 次播放</span><span>${item.duration}</span></div>
+          </div>
+        </article>`
+    ).join("");
+
+    document.getElementById("sheetList").innerHTML = ordered.map(item => `
+      <div class="sheet-item">
+        <div class="thumb">▶</div>
+        <div class="sheet-item-info">
+          <div class="sheet-item-title">${item.title}</div>
+          <div class="sheet-item-meta">${item.duration}　${item.heat} 热度</div>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function toggleSort() {
+    order = order === "asc" ? "desc" : "asc";
+    localStorage.setItem(storageKey, order);
+    render();
+  }
+
+  document.getElementById("pageSort").addEventListener("click", toggleSort);
+  document.getElementById("sheetSort").addEventListener("click", toggleSort);
+  document.getElementById("viewToggle").addEventListener("click", () => {
+    listView = !listView;
+    render();
+  });
+  document.getElementById("start").addEventListener("click", () => {
+    player.classList.add("visible");
+  });
+  document.getElementById("close").addEventListener("click", () => {
+    player.classList.remove("visible");
+  });
+  document.getElementById("showAll").addEventListener("click", () => {
+    player.classList.remove("visible");
+  });
+
+  render();
+</script>
+</body>
+</html>
